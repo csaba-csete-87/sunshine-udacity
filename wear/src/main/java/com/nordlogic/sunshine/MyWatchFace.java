@@ -267,10 +267,13 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mTime.setToNow();
             String text = String.format("%d:%02d", mTime.hour, mTime.minute);
 
-            canvas.drawText(text, mXOffsetWatch, mYOffsetWatch, mWatchTextPaint);
-            canvas.drawText("MON, FEB 22 2016", mXOffsetDate, mYOffsetDate, mDateTextPaint);
+//            canvas.drawText(text, mXOffsetWatch, mYOffsetWatch, mWatchTextPaint);
+            drawCenteredText(canvas, mWatchTextPaint, text, mYOffsetWatch);
+//            canvas.drawText("MON, FEB 22 2016", mXOffsetDate, mYOffsetDate, mDateTextPaint);
+            drawCenteredText(canvas, mDateTextPaint, "MON, FEB 22 2016", mYOffsetDate);
             canvas.drawLine(mXSeparatorStart, mYOffsetSeparator, mXSeparatorEnd, mYOffsetSeparator, mSeparatorPaint);
-            canvas.drawText("25° 26°", mXOffsetWeather, mYOffsetWeather, mWeatherTextPaint);
+//            canvas.drawText("25° 26°", mXOffsetWeather, mYOffsetWeather, mWeatherTextPaint);
+            drawCenteredText(canvas, mDateTextPaint, "25° 26°", mYOffsetWeather);
         }
 
         /**
@@ -303,6 +306,14 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
+        }
+
+        public void drawCenteredText(Canvas canvas, Paint paint, String text, float offsetY) {
+            Rect bounds = new Rect();
+            paint.getTextBounds(text, 0, text.length(), bounds);
+            int x = (canvas.getWidth() / 2) - (bounds.width() / 2);
+//            int y = (canvas.getHeight() / 2) - (bounds.height() / 2);
+            canvas.drawText(text, x, offsetY, paint);
         }
     }
 }

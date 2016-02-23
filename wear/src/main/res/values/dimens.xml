@@ -4,24 +4,23 @@
     <dimen name="digital_text_size_round">36dp</dimen>
     <dimen name="digital_x_offset">48dp</dimen>
     <dimen name="digital_x_offset_round">48dp</dimen>
-    <dimen name="digital_y_offset">64dp</dimen>
+    <dimen name="digital_y_offset">66dp</dimen>
 
     <dimen name="date_text_size">18dp</dimen>
     <dimen name="date_text_size_round">18dp</dimen>
     <dimen name="date_x_offset">16dp</dimen>
     <dimen name="date_x_offset_round">16dp</dimen>
-    <dimen name="date_y_offset">88dp</dimen>
+    <dimen name="date_y_offset">96dp</dimen>
 
-    <dimen name="separator_y_offset">108dp</dimen>
-    <dimen name="separator_x_start">64dp</dimen>
-    <dimen name="separator_x_start_round">64dp</dimen>
-    <dimen name="separator_x_end">128dp</dimen>
-    <dimen name="separator_x_end_round">128dp</dimen>
+    <dimen name="separator_length">48dp</dimen>
+    <dimen name="separator_y_offset">110dp</dimen>
 
     <dimen name="weather_text_size">28dp</dimen>
     <dimen name="weather_text_size_round">28dp</dimen>
     <dimen name="weather_x_offset">68dp</dimen>
     <dimen name="weather_x_offset_round">68dp</dimen>
     <dimen name="weather_y_offset">144dp</dimen>
+
+    <dimen name="all_y_offset_round">16dp</dimen>
 
 </resources>

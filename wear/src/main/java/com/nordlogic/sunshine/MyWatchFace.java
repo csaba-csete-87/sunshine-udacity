@@ -45,7 +45,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MyWatchFace extends CanvasWatchFaceService {
     private static final Typeface NORMAL_TYPEFACE =
-        Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+            Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
     /**
      * Update rate in milliseconds for interactive mode. We update once a second since seconds are
@@ -111,19 +111,19 @@ public class MyWatchFace extends CanvasWatchFaceService {
         float mYOffsetDate;
         float mYOffsetSeparator;
         float mYOffsetWeather;
-        float mXSeparatorStart;
-        float mXSeparatorEnd;
+        float mSeparatorLength;
         float mXOffsetWeather;
+        private float mYAllOffset;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(MyWatchFace.this)
-                .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
-                .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
-                .setShowSystemUiTime(false)
-                .build());
+                    .setCardPeekMode(WatchFaceStyle.PEEK_MODE_VARIABLE)
+                    .setBackgroundVisibility(WatchFaceStyle.BACKGROUND_VISIBILITY_INTERRUPTIVE)
+                    .setShowSystemUiTime(false)
+                    .build());
             Resources resources = MyWatchFace.this.getResources();
             mYOffsetWatch = resources.getDimension(R.dimen.digital_y_offset);
             mYOffsetDate = resources.getDimension(R.dimen.date_y_offset);
@@ -206,23 +206,27 @@ public class MyWatchFace extends CanvasWatchFaceService {
             Resources resources = MyWatchFace.this.getResources();
             boolean isRound = insets.isRound();
             mXOffsetWatch = resources.getDimension(isRound
-                ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
+                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float digitalTextSize = resources.getDimension(isRound
-                ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
+                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
             float dateTextSize = resources.getDimension(isRound
-                ? R.dimen.date_text_size_round : R.dimen.date_text_size);
+                    ? R.dimen.date_text_size_round : R.dimen.date_text_size);
             float weatherTextSize = resources.getDimension(isRound
-                ? R.dimen.weather_text_size_round : R.dimen.weather_text_size);
+                    ? R.dimen.weather_text_size_round : R.dimen.weather_text_size);
 
             mXOffsetDate = resources.getDimension(isRound
-                ? R.dimen.date_x_offset_round : R.dimen.date_x_offset);
-
-            mXSeparatorStart = resources.getDimension(isRound
-                ? R.dimen.separator_x_start_round : R.dimen.separator_x_start);
-            mXSeparatorEnd = resources.getDimension(isRound
-                ? R.dimen.separator_x_end_round : R.dimen.separator_x_end);
+                    ? R.dimen.date_x_offset_round : R.dimen.date_x_offset);
+            mSeparatorLength = resources.getDimension(R.dimen.separator_length);
             mXOffsetWeather = resources.getDimension(isRound
-                ? R.dimen.weather_x_offset_round : R.dimen.weather_x_offset);
+                    ? R.dimen.weather_x_offset_round : R.dimen.weather_x_offset);
+            mYAllOffset = resources.getDimension(R.dimen.all_y_offset_round);
+
+            if (isRound) {
+                mYOffsetWatch += mYAllOffset;
+                mYOffsetDate += mYAllOffset;
+                mYOffsetSeparator += mYAllOffset;
+                mYOffsetWeather += mYAllOffset;
+            }
 
             mWatchTextPaint.setTextSize(digitalTextSize);
             mDateTextPaint.setTextSize(dateTextSize);
@@ -258,7 +262,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         public void onDraw(Canvas canvas, Rect bounds) {
             // Draw the background.
             if (isInAmbientMode()) {
-                canvas.drawColor(Color.BLUE);
+                canvas.drawColor(Color.BLACK);
             } else {
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
             }
@@ -267,13 +271,10 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mTime.setToNow();
             String text = String.format("%d:%02d", mTime.hour, mTime.minute);
 
-//            canvas.drawText(text, mXOffsetWatch, mYOffsetWatch, mWatchTextPaint);
             drawCenteredText(canvas, mWatchTextPaint, text, mYOffsetWatch);
-//            canvas.drawText("MON, FEB 22 2016", mXOffsetDate, mYOffsetDate, mDateTextPaint);
             drawCenteredText(canvas, mDateTextPaint, "MON, FEB 22 2016", mYOffsetDate);
-            canvas.drawLine(mXSeparatorStart, mYOffsetSeparator, mXSeparatorEnd, mYOffsetSeparator, mSeparatorPaint);
-//            canvas.drawText("25° 26°", mXOffsetWeather, mYOffsetWeather, mWeatherTextPaint);
-            drawCenteredText(canvas, mDateTextPaint, "25° 26°", mYOffsetWeather);
+            drawCenteredLine(canvas, mSeparatorPaint, mSeparatorLength, mYOffsetSeparator);
+            drawCenteredText(canvas, mWeatherTextPaint, "25° 26°", mYOffsetWeather);
         }
 
         /**
@@ -303,7 +304,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             if (shouldTimerBeRunning()) {
                 long timeMs = System.currentTimeMillis();
                 long delayMs = INTERACTIVE_UPDATE_RATE_MS
-                    - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
+                        - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
@@ -312,8 +313,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
             Rect bounds = new Rect();
             paint.getTextBounds(text, 0, text.length(), bounds);
             int x = (canvas.getWidth() / 2) - (bounds.width() / 2);
-//            int y = (canvas.getHeight() / 2) - (bounds.height() / 2);
             canvas.drawText(text, x, offsetY, paint);
+        }
+
+        private void drawCenteredLine(Canvas canvas, Paint paint, float length, float offsetY) {
+            float x = (canvas.getWidth() / 2) - (length / 2);
+            canvas.drawLine(x, offsetY, x + length, offsetY, paint);
         }
     }
 }

@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         Uri contentUri = getIntent() != null ? getIntent().getData() : null;
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
@@ -73,20 +73,20 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
                     fragment.setArguments(args);
                 }
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
-                        .commit();
+                    .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
             }
         } else {
             mTwoPane = false;
             getSupportActionBar().setElevation(0f);
         }
 
-        ForecastFragment forecastFragment =  ((ForecastFragment)getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_forecast));
+        ForecastFragment forecastFragment = ((ForecastFragment) getSupportFragmentManager()
+            .findFragmentById(R.id.fragment_forecast));
         forecastFragment.setUseTodayLayout(!mTwoPane);
         if (contentUri != null) {
             forecastFragment.setInitialSelectedDate(
-                    WeatherContract.WeatherEntry.getDateFromUri(contentUri));
+                WeatherContract.WeatherEntry.getDateFromUri(contentUri));
         }
 
         SunshineSyncAdapter.initializeSyncAdapter(this);
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             // a token. If we do not, then we will start the IntentService that will register this
             // application with GCM.
             SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(this);
+                PreferenceManager.getDefaultSharedPreferences(this);
             boolean sentToken = sharedPreferences.getBoolean(SENT_TOKEN_TO_SERVER, false);
             if (!sentToken) {
                 Intent intent = new Intent(this, RegistrationIntentService.class);
@@ -135,19 +135,20 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
     @Override
     protected void onResume() {
         super.onResume();
-        String location = Utility.getPreferredLocation( this );
+        String location = Utility.getPreferredLocation(this);
         // update the location in our second pane using the fragment manager
-            if (location != null && !location.equals(mLocation)) {
-            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
-            if ( null != ff ) {
+        if (location != null && !location.equals(mLocation)) {
+            ForecastFragment ff = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
+            if (null != ff) {
                 ff.onLocationChanged();
             }
-            DetailFragment df = (DetailFragment)getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
-            if ( null != df ) {
+            DetailFragment df = (DetailFragment) getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+            if (null != df) {
                 df.onLocationChanged(location);
             }
             mLocation = location;
         }
+        SunshineSyncAdapter.syncImmediately(this);
     }
 
     @Override
@@ -163,15 +164,15 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             fragment.setArguments(args);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
-                    .commit();
+                .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+                .commit();
         } else {
             Intent intent = new Intent(this, DetailActivity.class)
-                    .setData(contentUri);
+                .setData(contentUri);
 
             ActivityOptionsCompat activityOptions =
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(this,
-                            new Pair<View, String>(vh.mIconView, getString(R.string.detail_icon_transition_name)));
+                ActivityOptionsCompat.makeSceneTransitionAnimation(this,
+                    new Pair<View, String>(vh.mIconView, getString(R.string.detail_icon_transition_name)));
             ActivityCompat.startActivity(this, intent, activityOptions.toBundle());
         }
     }
@@ -187,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         if (resultCode != ConnectionResult.SUCCESS) {
             if (apiAvailability.isUserResolvableError(resultCode)) {
                 apiAvailability.getErrorDialog(this, resultCode,
-                        PLAY_SERVICES_RESOLUTION_REQUEST).show();
+                    PLAY_SERVICES_RESOLUTION_REQUEST).show();
             } else {
                 Log.i(LOG_TAG, "This device is not supported.");
                 finish();

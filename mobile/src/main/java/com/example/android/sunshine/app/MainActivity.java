@@ -16,6 +16,7 @@
 package com.example.android.sunshine.app;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
 
     private boolean mTwoPane;
     private String mLocation;
+    private WeatherBroadcastReceiver mWeatherBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,11 +150,19 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             }
             mLocation = location;
         }
-        SunshineSyncAdapter.syncImmediately(this);
+        mWeatherBroadcastReceiver = new WeatherBroadcastReceiver();
+        registerReceiver(mWeatherBroadcastReceiver, new IntentFilter("com.example.android.sunshine.app.WEATHER_UPDATE"));
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(mWeatherBroadcastReceiver);
+        super.onPause();
     }
 
     @Override
     public void onItemSelected(Uri contentUri, ForecastAdapter.ForecastAdapterViewHolder vh) {
+        SunshineSyncAdapter.syncImmediately(this);
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
@@ -167,6 +177,7 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
                 .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
                 .commit();
         } else {
+
             Intent intent = new Intent(this, DetailActivity.class)
                 .setData(contentUri);
 

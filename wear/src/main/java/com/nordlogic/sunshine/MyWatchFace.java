@@ -38,12 +38,14 @@ import android.view.WindowInsets;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
 import java.lang.ref.WeakReference;
@@ -127,11 +129,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
             }
         };
 
-        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(MyWatchFace.this)
-            .addConnectionCallbacks(this)
-            .addOnConnectionFailedListener(this)
-            .addApi(Wearable.API)
-            .build();
+        GoogleApiClient mGoogleApiClient;
 
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
@@ -188,6 +186,15 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mCalendar = Calendar.getInstance();
             mDate = new Date();
             initFormats();
+            initGoogleApi();
+        }
+
+        private void initGoogleApi() {
+            mGoogleApiClient = new GoogleApiClient.Builder(MyWatchFace.this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(Wearable.API)
+                .build();
         }
 
         @Override
@@ -485,16 +492,11 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
         @Override
         public void onDataChanged(DataEventBuffer dataEventBuffer) {
-            Log.e(TAG, "" + dataEventBuffer);
-            Log.e(TAG, "" + dataEventBuffer);
-            Log.e(TAG, "" + dataEventBuffer);
-            Log.e(TAG, "" + dataEventBuffer);
-            Log.e(TAG, "" + dataEventBuffer);
-            Log.d("LiveSessionDataFragment", "ON DATA CHANGED");
             for (DataEvent event : dataEventBuffer) {
                 Log.d(TAG, "ITERATING EVENTS");
                 if (event.getType() == DataEvent.TYPE_CHANGED &&
-                    event.getDataItem().getUri().getPath().contains("/weather")) {
+                    event.getDataItem().getUri().getPath().contains("/weather")
+                    ) {
                     DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                     Log.e("test", "" + dataMapItem.getDataMap().get("high"));
                     Log.e("test", "" + dataMapItem.getDataMap().get("low"));
@@ -525,25 +527,34 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
         @Override
         public void onConnected(Bundle bundle) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
+//            if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "onConnected: " + bundle);
-            }
-            Wearable.DataApi.addListener(mGoogleApiClient, Engine.this);
-            updateConfigDataItemAndUiOnStartup();
+//            }
+            Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                @Override
+                public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+                    if(getConnectedNodesResult != null){
+
+                    }
+                }
+            });
+            Wearable.DataApi.addListener(mGoogleApiClient, this);
+            Wearable.DataApi.getDataItems(mGoogleApiClient);
+//            updateConfigDataItemAndUiOnStartup();
         }
 
         @Override
         public void onConnectionFailed(ConnectionResult result) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
+//            if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "onConnectionFailed: " + result);
-            }
+//            }
         }
 
         @Override
         public void onConnectionSuspended(int cause) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
+//            if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "onConnectionSuspended: " + cause);
-            }
+//            }
         }
     }
 }

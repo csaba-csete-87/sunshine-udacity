@@ -50,7 +50,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Random;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
@@ -409,14 +408,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         boolean displayNotifications = prefs.getBoolean(displayNotificationsKey,
             Boolean.parseBoolean(context.getString(R.string.pref_enable_notifications_default)));
 
-//        if (displayNotifications) {
-        if (true) {
-
+        if (displayNotifications) {
             String lastNotificationKey = context.getString(R.string.pref_last_notification);
             long lastSync = prefs.getLong(lastNotificationKey, 0);
 
-//            if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
-            if (true) {
+            if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
                 // Last sync was more than 1 day ago, let's send a notification with the weather.
                 String locationQuery = Utility.getPreferredLocation(context);
 
@@ -436,7 +432,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     int artResourceId = Utility.getArtResourceForWeatherCondition(weatherId);
                     String artUrl = Utility.getArtUrlForWeatherCondition(context, weatherId);
 
-                    notifyWearable(iconId, high, low);
+                    notifyWearable(weatherId, high, low);
 
                     // On Honeycomb and higher devices, we can retrieve the size of the large icon
                     // Prior to that, we use a fixed size
@@ -512,10 +508,10 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private void notifyWearable(int iconId, double high, double low) {
+    private void notifyWearable(int weatherId, double high, double low) {
         Intent i = new Intent("com.example.android.sunshine.app.WEATHER_UPDATE");
         Bundle b = new Bundle();
-        b.putInt(WearableUpdaterService.EXTRA_ICON_ID, iconId);
+        b.putInt(WearableUpdaterService.EXTRA_WEATHER_ID, weatherId);
         b.putDouble(WearableUpdaterService.EXTRA_HIGH, high);
         b.putDouble(WearableUpdaterService.EXTRA_LOW, low);
         i.putExtras(b);

@@ -18,7 +18,7 @@ import com.google.android.gms.wearable.Wearable;
 
 public class WearableUpdaterService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    public static final String EXTRA_ICON_ID = "iconId";
+    public static final String EXTRA_WEATHER_ID = "iconId";
     public static final String EXTRA_HIGH = "high";
     public static final String EXTRA_LOW = "low";
     private static final String EXTRA_TIME_STAMP = "timestamp";
@@ -36,7 +36,7 @@ public class WearableUpdaterService extends Service implements GoogleApiClient.C
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
-            mIconId = intent.getIntExtra(EXTRA_ICON_ID, 0);
+            mIconId = intent.getIntExtra(EXTRA_WEATHER_ID, 0);
             mHigh = intent.getDoubleExtra(EXTRA_HIGH, 0);
             mLow = intent.getDoubleExtra(EXTRA_LOW, 0);
             initGoogleApiClient();
@@ -69,7 +69,7 @@ public class WearableUpdaterService extends Service implements GoogleApiClient.C
     public void sendDataToWearable() {
         PutDataMapRequest putDataMapRequest = PutDataMapRequest.create("/weather");
 
-        putDataMapRequest.getDataMap().putInt(EXTRA_ICON_ID, mIconId);
+        putDataMapRequest.getDataMap().putInt(EXTRA_WEATHER_ID, mIconId);
         putDataMapRequest.getDataMap().putDouble(EXTRA_HIGH, mHigh);
         putDataMapRequest.getDataMap().putDouble(EXTRA_LOW, mLow);
         putDataMapRequest.getDataMap().putLong(EXTRA_TIME_STAMP, System.currentTimeMillis());
@@ -81,7 +81,7 @@ public class WearableUpdaterService extends Service implements GoogleApiClient.C
             public void onResult(DataApi.DataItemResult dataItemResult) {
                 if (dataItemResult != null) {
                     DataMap dataMap = DataMapItem.fromDataItem(dataItemResult.getDataItem()).getDataMap();
-                    Log.d("iconId", "" + dataMap.getInt(EXTRA_ICON_ID));
+                    Log.d("iconId", "" + dataMap.getInt(EXTRA_WEATHER_ID));
                     Log.d("high", "" + dataMap.getDouble(EXTRA_HIGH));
                     Log.d("low", "" + dataMap.getDouble(EXTRA_LOW));
                 }
